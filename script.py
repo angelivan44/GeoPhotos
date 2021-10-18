@@ -9,8 +9,7 @@ class Foto():
         self.documents = os.listdir(dirFotos)
 
     def DMS2DD(self,data, direction):
-        print(data)
-        dd = float(data[0][0]) + float(data[1][0]/60) + float(data[2][0]/3600);
+        dd = float(data[0][0]/data[0][1]) + float(data[1][0]/(data[1][1]*60)) + float(data[2][0]/(data[2][1]*3600));
         if (direction == "S" or direction == "W") :
             dd = dd * -1; 
         return dd;
@@ -18,6 +17,7 @@ class Foto():
     def Write(self):
         kml = simplekml.Kml()
         folder = kml.newfolder(name="Fotos")
+        file = """file:///"""
         for index, picture in enumerate(self.documents):
             image_path = self.rutaFotos+"\\"+picture
             try:
@@ -28,11 +28,10 @@ class Foto():
                 metada = {}
             try:
                 ubication = metada[34853]
-                print(ubication)
             except:
                 ubication = "none"
             if(ubication != "none"):
-                file = """file:///"""
+                
                 este = self.DMS2DD(ubication[4],ubication[3])
                 norte = self.DMS2DD(ubication[2],ubication[1])
                 descripcion =  f"""<html> 
@@ -47,11 +46,9 @@ class Foto():
                                     </div>
                                     </html>
                                         """
-                pto = folder.newpoint(name=index, coords=[(este,norte)], description=descripcion)
-            return True
-        
-            
-        kml.save(self.rutaDir+"\\"+"exp.kml")
-
+                folder.newpoint(name=str(index), coords=[(este,norte)], description=descripcion)
+        kml.save(path=str(self.rutaDir+"\\"+"exp.kml"), format=True)
+        return True
+       
 
 
